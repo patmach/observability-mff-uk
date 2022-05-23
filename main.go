@@ -5,13 +5,17 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	// "github.com/prometheus/client_golang/prometheus"
 	// "github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
+
 	// "log"
 	"math/rand"
 	"net/http"
@@ -90,14 +94,10 @@ func main() {
 	log := funcLog("main")
 	r := mux.NewRouter()
 	r.HandleFunc("/", homeHandler)
-	// TODO Metrics: Expose metrics endpoint. Uncomment following line.
-	// r.Handle("/metrics", promhttp.Handler())
-	// TODO Tracing: Enable tracing middleware. Uncomment following line.
-	// r.Use(tracingMiddleware)
-	// TODO Metrics: Enable metrics middleware. Uncomment following line.
-	// r.Use(metricsMiddleware)
-	// TODO Logging: Enable logging middleware. Uncomment following line.
-	// r.Use(loggingMiddleware)
+	r.Handle("/metrics", promhttp.Handler())
+	r.Use(tracingMiddleware)
+	r.Use(metricsMiddleware)
+	r.Use(loggingMiddleware)
 	log.Infof("starting observability app on: %s", appAddr)
 	http.ListenAndServe(appAddr, r)
 }
