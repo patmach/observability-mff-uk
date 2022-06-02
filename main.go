@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	// "github.com/prometheus/client_golang/prometheus"
@@ -65,29 +67,29 @@ func init() {
 		FullTimestamp: true,
 	})
 	// TODO Logging: Enable debug level of logging. Uncomment following line.
-	// logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetLevel(logrus.DebugLevel)
 	// Set JSON formatter.
 	// TODO Logging: Enable json formatting for logging. Uncomment following line.
-	// logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.SetFormatter(&logrus.JSONFormatter{})
 	// Set logging to a file. Comment out following 2 lines to log on the console.
 	// TODO Logging: Enable logging to a file. Uncomment following 2 lines.
-	// f := getLogFile()
-	// logrus.SetOutput(f)
+	f := getLogFile()
+	logrus.SetOutput(f)
 	// Register Prometheus metrics
 	// TODO Metrics: Register metrics. Uncomment following 3 lines.
-	// prometheus.Register(totalRequests)
-	// prometheus.Register(responseStatus)
-	// prometheus.Register(httpDuration)
+	prometheus.Register(totalRequests)
+	prometheus.Register(responseStatus)
+	prometheus.Register(httpDuration)
 	// Set tracing provider
 	// TODO Tracing: Configure tracing provider. Uncomment following 4 lines.
-	// tp, err := tracerProvider(tracingUrl)
-	// if err != nil {
-	//	log.Fatal(err)
-	// }
+	tp, err := tracerProvider(tracingUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
 	// TODO Tracing: Enable tracing provider. Uncomment following line.
-	// otel.SetTracerProvider(tp)
+	otel.SetTracerProvider(tp)
 	// TODO Tracing: Enable cross-boundary context propagation for tracing. Uncomment following line.
-	// otel.SetTextMapPropagator(propagation.TraceContext{})
+	otel.SetTextMapPropagator(propagation.TraceContext{})
 }
 
 func main() {
